@@ -4,6 +4,8 @@ VIEWER_HTML=chromium
 PDF=rst2pdf
 VIEWER_PDF=evince
 
+KINDLEGEN=kindlegen
+
 BUILDDIR=build
 STYLEDIR=style
 
@@ -27,9 +29,9 @@ GENERATED_COMMENT='.. This is a generated file, do not edit'
 all:compile
 
 kindle:compile
-	../kindle/kindlegen ${TARGET}.html
+	${KINDLEGEN} ${TARGET}.html
 
-compile:html pdf
+compile:html
 
 html:${TARGET}.html
 
