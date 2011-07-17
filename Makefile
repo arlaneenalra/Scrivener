@@ -107,6 +107,9 @@ init:	# setup a new initial project
 		fi ; \
 	done
 
+	@cp Scrivener/.gitignore .
+	@cp Scrivener/root.rst .
+
 
 # setup the build dir so that everything works nice
 ${BUILDDIR}:
