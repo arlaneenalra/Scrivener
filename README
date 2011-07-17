@@ -12,3 +12,4 @@ verify - create a trivially encrypted version for use with nano-wrimo
 view - view an html version of the document
 viewpdf - view a pdf version of the document
 
+init - copy templates from the Scrivener submodule into the main project
