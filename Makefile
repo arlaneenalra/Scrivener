@@ -53,7 +53,7 @@ verify:clean html
 
 	@echo "Paste to verfier . . ."
 
-setup:${BUILDDIR} root.rst ${TARGET_SUBDIRS}
+setup:${BUILDDIR} ${ROOT}.rst ${TARGET_SUBDIRS}
 
 view:${TARGET}.html
 	${VIEWER_HTML} ${TARGET}.html &
@@ -107,9 +107,9 @@ init:	# setup a new initial project
 		fi ; \
 	done
 
-	@cp Scrivener/.gitignore .
-	@cp Scrivener/root.rst .
-
+	@if [ ! -f ${ROOT}.rst ] ; then \
+		cp Scrivener/${ROOT}.rst . ;\
+	fi
 
 # setup the build dir so that everything works nice
 ${BUILDDIR}:
