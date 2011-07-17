@@ -1,0 +1,14 @@
+Targets:
+
+clean - remove generated files and build directory
+
+html - Generate a html version of the document
+pdf - Generate a pdf version of the document
+kindle - attempt to generate a kindle version of the document
+wc - clean and do a word count
+
+verify - create a trivially encrypted version for use with nano-wrimo
+
+view - view an html version of the document
+viewpdf - view a pdf version of the document
+
