@@ -14,11 +14,11 @@ ROOT=root
 TARGET=${BUILDDIR}/${ROOT}
 TARGET_SUBDIRS=gen_body.rst
 
-# find all chapters etc.
-SOURCE_DIRS=chapters appendices
-SUBDIR_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/*.rst)))
+STYLEDIR=style
 
-#STYLES=$(sort $(wildcard ${STYLEDIR}/*.css))
+# find all chapters etc.
+SOURCE_DIRS=chapters
+SUBDIR_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/*.rst)))
 
 RAW_TEXT=links -dump ${TARGET}.html
 WC=wc -w
@@ -92,6 +92,20 @@ ${TARGET_SUBDIRS}:${SUBDIR_FILES}
 	done
 
 	@echo 'Done.'
+
+init:	# setup a new initial project
+	@if [ ! -d ${STYLEDIR} ] ; then \
+		mkdir ${STYLEDIR} ; \
+		cp Scrivener/style/* ${STYLEDIR} ; \
+	fi
+
+	@for source_dir in ${SOURCE_DIRS}; do \
+		if [ ! -d $$source_dir ] ; then \
+			echo 'Creating '$$source_dir ;\
+			mkdir $$source_dir ; \
+			cp Scrivener/$$source_dir/* $$source_dir ; \
+		fi ; \
+	done
 
 
 # setup the build dir so that everything works nice
