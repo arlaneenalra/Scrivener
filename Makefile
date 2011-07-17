@@ -53,7 +53,7 @@ verify:clean html
 
 	@echo "Paste to verfier . . ."
 
-setup:${BUILDDIR} root.rst ${TARGET_SUBDIRS} ${TARGET_STYLES}
+setup:${BUILDDIR} root.rst ${TARGET_SUBDIRS}
 
 view:${TARGET}.html
 	${VIEWER_HTML} ${TARGET}.html &
@@ -77,21 +77,6 @@ ${TARGET}.html:setup
 	@${PDF} ${ROOT}.rst -b 1 --stylesheets=style/pdf.sty -o ${TARGET}.pdf
 
 	@echo 'Done.'
-
-
-#${TARGET_STYLES}:${STYLES}
-#	@echo 'Generating '$@' styles . . . .'
-#	@echo
-#
-#	@rm -f $@
-#
-#	@for file in ${STYLES}; do \
-#		echo '	Adding '$$file; \
-#		echo '/* '$$file' */'>> $@; \
-#		cat $$file >> $@; \
-#	done
-#
-#	@echo 'Done.'
 
 # build a universal chpater include using dir listing for CHAPTERSDIR
 ${TARGET_SUBDIRS}:${SUBDIR_FILES}
@@ -123,5 +108,4 @@ clean:
 	@rm -rf ${BUILDDIR}/${CHAPTERDIR}
 	@rm -rf ${BUILDDIR}
 	@rm -f ${TARGET_SUBDIRS}
-	@rm -f ${TARGET_STYLES}
 	@find . -name '*~' -exec rm {} \;
