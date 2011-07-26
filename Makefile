@@ -1,8 +1,8 @@
 HTML=rst2html.py
 VIEWER_HTML=chromium
 
-PDF=rst2pdf
-VIEWER_PDF=evince
+# PDF=rst2pdf
+# VIEWER_PDF=evince
 
 KINDLEGEN=kindlegen
 
@@ -18,24 +18,26 @@ STYLEDIR=style
 
 # find all chapters etc.
 SOURCE_DIRS=chapters
-SUBDIR_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/*.rst)))
+SUBDIR_SOURCE_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/*.rst)))
+SUBDIR_TARGET_FILES=$(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.html), ${BUILDDIR}/${file})
+SUBDIR_RAW_FILES=$(foreach file, $(SUBDIR_TARGET_FILES:%.html=%.txt), ${file})
 
-RAW_TEXT=links -dump ${TARGET}.html
+RAW_TEXT=links -dump
 WC=wc -w
 
 
 GENERATED_COMMENT='.. This is a generated file, do not edit'
 
-all:compile
+all:html
 
-kindle:compile
-	${KINDLEGEN} ${TARGET}.html
+kindle:html
+	sed -e 's/<!-- mbp:pagebreak -->/<mbp:pagebreak\/>/g' ${TARGET}.html > ${TARGET}.kindle.html
+	${KINDLEGEN} ${TARGET}.kindle.html
 
-compile:html
+html:setup ${TARGET}.html ${SUBDIR_TARGET_FILES}
+raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
 
-html:${TARGET}.html
-
-pdf:${TARGET}.pdf
+# pdf:${TARGET}.pdf
 
 wc:clean html 
 	@echo
@@ -53,7 +55,8 @@ verify:clean html
 
 	@echo "Paste to verfier . . ."
 
-setup:${BUILDDIR} ${ROOT}.rst ${TARGET_SUBDIRS}
+# setup:${BUILDDIR} ${ROOT}.rst ${TARGET_SUBDIRS}
+setup:${BUILDDIR}
 
 view:${TARGET}.html
 	${VIEWER_HTML} ${TARGET}.html &
@@ -63,35 +66,53 @@ viewpdf:${TARGET}.pdf
 
 
 # target to actually build out our document
-${TARGET}.html:setup
+# ${TARGET}.html:setup
+# 	@echo 'Generating HTML'
+
+# 	@${HTML} --stylesheet=style/default.css ${ROOT}.rst ${TARGET}.html
+
+# 	@echo 'Done.'
+
+%.txt: %.html
+	@echo 'Generating TXT'
+	@echo $<
+
+	@${RAW_TEXT} $< > $@
+
+	@echo 'Done.'
+
+${BUILDDIR}/%.html: %.rst
 	@echo 'Generating HTML'
+	@echo $<
 
-	@${HTML} --stylesheet=style/default.css ${ROOT}.rst ${TARGET}.html
-
-	@echo 'Done.'
-
-# target to actually build out our document
-%.pdf:setup
-	@echo 'Generating PDF'
-
-	@${PDF} ${ROOT}.rst -b 1 --stylesheets=style/pdf.sty -o ${TARGET}.pdf
+	@${HTML} --stylesheet=style/default.css $< $@
 
 	@echo 'Done.'
 
-# build a universal chpater include using dir listing for CHAPTERSDIR
-${TARGET_SUBDIRS}:${SUBDIR_FILES}
 
-	@echo 'Generating '$@' build files . . . .'
-	@echo
+# # target to actually build out our document
+# %.pdf:
+# 	@echo 'Generating PDF'
 
-	@echo ${GENERATED_COMMENT} > $@
+# 	@${PDF} ${ROOT}.rst -b 1 --stylesheets=style/pdf.sty -o ${TARGET}.pdf
 
-	@for file in ${SUBDIR_FILES}; do \
-		echo '	Adding '$$file; \
-		echo '.. include:: '$$file >> $@; \
-	done
+# 	@echo 'Done.'
 
-	@echo 'Done.'
+# # build a universal chpater include using dir listing for CHAPTERSDIR
+# ${TARGET_SUBDIRS}:${SUBDIR_FILES}
+
+# 	@echo 'Generating '$@' build files . . . .'
+# 	@echo
+
+# 	@echo ${GENERATED_COMMENT} > $@
+
+# 	@for file in ${SUBDIR_FILES}; do \
+# 		echo '	Adding '$$file; \
+# 		echo '.. mbp:pagebreak' >> $@; \
+# 		echo '.. include:: '$$file >> $@; \
+# 	done
+
+# 	@echo 'Done.'
 
 init:	# setup a new initial project
 	@if [ ! -d ${STYLEDIR} ] ; then \
@@ -117,9 +138,12 @@ ${BUILDDIR}:
 		mkdir ${BUILDDIR}  ; \
 	fi
 
-	@if [ ! -d ${BUILDDIR}/${CHAPTERDIR} ] ; then \
-		mkdir ${BUILDDIR}/${CHAPTERDIR}  ; \
-	fi
+# setup child build dirs
+	@for source_dir in ${SOURCE_DIRS}; do \
+		if [ ! -d ${BUILDDIR}/$$source_dir ] ; then \
+			mkdir ${BUILDDIR}/$$source_dir ; \
+		fi ; \
+	done
 
 clean:
 	@rm -rf ${BUILDDIR}/${CHAPTERDIR}
