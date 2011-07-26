@@ -1,9 +1,6 @@
 HTML=rst2html.py
 VIEWER_HTML=chromium
 
-# PDF=rst2pdf
-# VIEWER_PDF=evince
-
 KINDLEGEN=kindlegen
 
 BUILDDIR=build
@@ -12,6 +9,7 @@ STYLEDIR=style
 ROOT=root
 
 TARGET=${BUILDDIR}/${ROOT}
+
 TARGET_SUBDIRS=gen_body.rst
 
 STYLEDIR=style
@@ -37,21 +35,21 @@ kindle:html
 html:setup ${TARGET}.html ${SUBDIR_TARGET_FILES}
 raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
 
-# pdf:${TARGET}.pdf
 
-wc:clean html 
+wc:raw 
 	@echo
 	@echo
 	@echo
 	@echo "Number of Words :"
-	@exec ${RAW_TEXT} | ${WC}
+	@exec ${WC} ${SUBDIR_RAW_FILES}
 
-verify:clean html
+verify:raw
 	@echo
 	@echo
 	@echo
 
-	@exec ${RAW_TEXT} | caesar 13 | xclip
+	@exec cat ${SUBDIR_RAW_FILES} | caesar 13 | xclip
+
 
 	@echo "Paste to verfier . . ."
 
@@ -61,42 +59,15 @@ setup:${BUILDDIR}
 view:${TARGET}.html
 	${VIEWER_HTML} ${TARGET}.html &
 
-viewpdf:${TARGET}.pdf
-	${VIEWER_PDF} ${TARGET}.pdf &
-
-
-# target to actually build out our document
-# ${TARGET}.html:setup
-# 	@echo 'Generating HTML'
-
-# 	@${HTML} --stylesheet=style/default.css ${ROOT}.rst ${TARGET}.html
-
-# 	@echo 'Done.'
-
+# Generate raw txt files from html files
 %.txt: %.html
-	@echo 'Generating TXT'
-	@echo $<
-
+	@echo $< "->" $@
 	@${RAW_TEXT} $< > $@
 
-	@echo 'Done.'
-
+# Generate html files from rst files in the build dir
 ${BUILDDIR}/%.html: %.rst
-	@echo 'Generating HTML'
-	@echo $<
-
+	@echo $< "->" $@
 	@${HTML} --stylesheet=style/default.css $< $@
-
-	@echo 'Done.'
-
-
-# # target to actually build out our document
-# %.pdf:
-# 	@echo 'Generating PDF'
-
-# 	@${PDF} ${ROOT}.rst -b 1 --stylesheets=style/pdf.sty -o ${TARGET}.pdf
-
-# 	@echo 'Done.'
 
 # # build a universal chpater include using dir listing for CHAPTERSDIR
 # ${TARGET_SUBDIRS}:${SUBDIR_FILES}
