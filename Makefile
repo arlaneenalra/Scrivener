@@ -1,6 +1,9 @@
 HTML=rst2html.py
 VIEWER_HTML=chromium
 
+ODF=rst2odt.py
+MAN=rst2man.py
+
 KINDLEGEN=kindlegen
 
 BUILDDIR=build
@@ -17,8 +20,6 @@ STYLEDIR=style
 # find all chapters etc.
 SOURCE_DIRS=chapters
 SUBDIR_SOURCE_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/*.rst)))
-SUBDIR_TARGET_FILES=$(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.html), ${BUILDDIR}/${file})
-SUBDIR_RAW_FILES=$(foreach file, $(SUBDIR_TARGET_FILES:%.html=%.txt), ${file})
 
 RAW_TEXT=links -dump
 WC=wc -w
@@ -26,14 +27,17 @@ WC=wc -w
 
 GENERATED_COMMENT='.. This is a generated file, do not edit'
 
-all:html
+all:${BUILDDIR} html odf man raw
 
 kindle:html
 	sed -e 's/<!-- mbp:pagebreak -->/<mbp:pagebreak\/>/g' ${TARGET}.html > ${TARGET}.kindle.html
 	${KINDLEGEN} ${TARGET}.kindle.html
 
-html:setup ${TARGET}.html ${SUBDIR_TARGET_FILES}
-raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
+html:setup ${TARGET}.html $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.html), ${BUILDDIR}/${file}) 
+odf:setup ${TARGET}.odf $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.odf), ${BUILDDIR}/${file}) 
+man:setup ${TARGET}.man $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.man), ${BUILDDIR}/${file})
+raw:setup ${TARGET}.txt $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.txt), ${BUILDDIR}/${file}) 
+#raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
 
 
 wc:raw 
@@ -68,6 +72,14 @@ view:${TARGET}.html
 ${BUILDDIR}/%.html: %.rst
 	@echo $< "->" $@
 	@${HTML} --stylesheet=style/default.css $< $@
+
+${BUILDDIR}/%.odf: %.rst
+	@echo $< "->" $@
+	@${ODF} --stylesheet=style/styles.odt $< $@
+
+${BUILDDIR}/%.man: %.rst
+	@echo $< "->" $@
+	@${MAN} $< $@
 
 # # build a universal chpater include using dir listing for CHAPTERSDIR
 # ${TARGET_SUBDIRS}:${SUBDIR_FILES}
@@ -111,7 +123,7 @@ ${BUILDDIR}:
 
 # setup child build dirs
 	@for source_dir in ${SOURCE_DIRS}; do \
-		if [ ! -d ${BUILDDIR}/$$source_dir ] ; then \
+		if [ ! -d "${BUILDDIR}/$$source_dir" ] ; then \
 			mkdir ${BUILDDIR}/$$source_dir ; \
 		fi ; \
 	done
