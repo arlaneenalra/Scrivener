@@ -24,6 +24,7 @@ SUBDIR_SOURCE_FILES=$(foreach subdir,${SOURCE_DIRS},$(sort $(wildcard ${subdir}/
 RAW_TEXT=links -dump
 WC=wc -w
 
+OFFICE=libreoffice
 
 GENERATED_COMMENT='.. This is a generated file, do not edit'
 
@@ -35,6 +36,7 @@ kindle:html
 
 html:setup ${TARGET}.html $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.html), ${BUILDDIR}/${file}) 
 odf:setup ${TARGET}.odf $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.odf), ${BUILDDIR}/${file}) 
+doc:setup $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.doc), ${BUILDDIR}/${file}) 
 man:setup ${TARGET}.man $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.man), ${BUILDDIR}/${file})
 raw:setup ${TARGET}.txt $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.txt), ${BUILDDIR}/${file}) 
 #raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
@@ -76,6 +78,10 @@ ${BUILDDIR}/%.html: %.rst
 ${BUILDDIR}/%.odf: %.rst
 	@echo $< "->" $@
 	@${ODF} --stylesheet=style/styles.odt $< $@
+
+${BUILDDIR}/%.doc: ${BUILDDIR}/%.odf
+	@echo $< "->" $@
+	@cd ${BUILDDIR}/chapters ; ${OFFICE} --headless --convert-to doc:"MS word 97" $(abspath $<)
 
 ${BUILDDIR}/%.man: %.rst
 	@echo $< "->" $@
