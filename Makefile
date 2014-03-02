@@ -1,6 +1,7 @@
 VIEWER_HTML=chromium
 
-ifeq ($(shell which rst2html.py), "")
+PYTEST=$(shell which rst2html.py)
+ifeq ($(strip $(PYTEST)),)
   HTML=rst2html
   ODF=rst2odt
   MAN=rst2man
@@ -33,6 +34,10 @@ WC=wc -w
 OFFICE=libreoffice
 
 GENERATED_COMMENT='.. This is a generated file, do not edit'
+
+boom:
+	echo "'${PYTEST}'"
+	echo ${HTML}
 
 all:${BUILDDIR} html odf man raw
 
