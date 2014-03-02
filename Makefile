@@ -35,10 +35,6 @@ OFFICE=libreoffice
 
 GENERATED_COMMENT='.. This is a generated file, do not edit'
 
-boom:
-	echo "'${PYTEST}'"
-	echo ${HTML}
-
 all:${BUILDDIR} html odf man raw
 
 kindle:html
