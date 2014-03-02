@@ -1,13 +1,13 @@
 VIEWER_HTML=chromium
 
-ifeq ($(which rst2html.py), "")
-  HTML=rst2html.py
-  ODF=rst2odt.py
-  MAN=rst2man.py
-else
+ifeq ($(shell which rst2html.py), "")
   HTML=rst2html
   ODF=rst2odt
   MAN=rst2man
+else
+  HTML=rst2html.py
+  ODF=rst2odt.py
+  MAN=rst2man.py
 endif
 
 KINDLEGEN=kindlegen
