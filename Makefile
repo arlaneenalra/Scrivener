@@ -43,9 +43,12 @@ kindle:html
 
 html:setup ${TARGET}.html $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.html), ${BUILDDIR}/${file}) 
 odf:setup ${TARGET}.odf $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.odf), ${BUILDDIR}/${file}) 
-doc:setup $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.doc), ${BUILDDIR}/${file}) 
 man:setup ${TARGET}.man $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.man), ${BUILDDIR}/${file})
 raw:setup ${TARGET}.txt $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.txt), ${BUILDDIR}/${file}) 
+
+doc:docx
+docx:setup $(foreach file, $(SUBDIR_SOURCE_FILES:%.rst=%.docx), ${BUILDDIR}/${file})
+
 #raw:setup ${TARGET}.txt ${SUBDIR_RAW_FILES}
 
 
@@ -86,9 +89,9 @@ ${BUILDDIR}/%.odf: %.rst
 	@echo $< "->" $@
 	@${ODF} --stylesheet=style/styles.odt $< $@
 
-${BUILDDIR}/%.doc: ${BUILDDIR}/%.odf
+${BUILDDIR}/%.docx: ${BUILDDIR}/%.odf
 	@echo $< "->" $@
-	@cd ${BUILDDIR}/chapters ; ${OFFICE} --headless --convert-to doc:"MS word 97" $(abspath $<)
+	@cd ${BUILDDIR}/chapters ; ${OFFICE} --headless --convert-to docx $(abspath $<)
 
 ${BUILDDIR}/%.man: %.rst
 	@echo $< "->" $@
@@ -146,3 +149,4 @@ clean:
 	@rm -rf ${BUILDDIR}
 	@rm -f ${TARGET_SUBDIRS}
 	@find . -name '*~' -exec rm {} \;
+
